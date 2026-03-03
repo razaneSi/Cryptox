@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoX â€” Security Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">CryptoX</div>
+      <div class="brand-sub">SECURITY SUITE</div>
+    </div>
+  </div>
+
+  <nav>
+    <p class="nav-label">TOOLS &amp; UTILITIES</p>
+    <a href="/" class="nav-item {% if active=='dashboard' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+      {% if active=='dashboard' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/password-strength" class="nav-item {% if active=='password' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Password Strength
+      {% if active=='password' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/caesar-cipher" class="nav-item {% if active=='caesar' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Caesar Cipher
+      {% if active=='caesar' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/vigenere-cipher" class="nav-item {% if active=='vigenere' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      Vigenère Cipher
+      {% if active=='vigenere' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/hashing-exercise" class="nav-item {% if active=='hashing' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11a4 4 0 1 1 7.8 1.3L20 20.5"/><path d="M15 15l2-2m-1 4l2-2m-6-6l2-2m-1 4l2-2"/></svg>
+      Hashing Lab
+      {% if active=='hashing' %}<span class="dot"></span>{% endif %}
+    </a>
+  </nav>
+</aside>
+
+<!-- Main -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <button class="toggle-btn" onclick="document.querySelector('.sidebar').classList.toggle('collapsed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><line x1="11" y1="3" x2="21" y2="3"/><line x1="11" y1="12" x2="21" y2="12"/><line x1="11" y1="21" x2="21" y2="21"/></svg>
+    </button>
+    <div class="system-status">
+      <span class="status-dot"></span>
+      SYSTEM SECURE
+    </div>
+  </header>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="tool-page">
+  <div class="tool-header">
+    <div class="tool-page-icon purple">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11a4 4 0 1 1 7.8 1.3L20 20.5"/><path d="M15 15l2-2m-1 4l2-2m-6-6l2-2m-1 4l2-2"/></svg>
+    </div>
+    <div>
+      <h1>Password Hashing Lab</h1>
+      <p class="tool-subtitle">Hash passwords with a secure one-way method and verify candidates safely.</p>
+    </div>
+  </div>
+
+  <div class="cipher-grid">
+    <div class="panel">
+      <label class="field-label">PASSWORD TO HASH</label>
+      <input type="password" id="hash-input" class="field-input" placeholder="Enter password..." autocomplete="off" />
+
+      <button class="btn-execute" onclick="hashPassword()">
+        <span>Generate Hash (scrypt)</span>
+      </button>
+
+      <div class="diag-box hash-meta">
+        <p class="diag-title">HASHING NOTES</p>
+        <div class="check-list">
+          <div class="check-item">
+            <span class="chk-icon pass">i</span>
+            <span>Algorithm: scrypt (salted, adaptive).</span>
+          </div>
+          <div class="check-item">
+            <span class="chk-icon pass">i</span>
+            <span>Same password generates different hashes each run.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel output-panel">
+      <div class="output-header">
+        <span class="field-label">GENERATED HASH</span>
+        <button class="copy-btn" onclick="copyOutput('hash-output')" title="Copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+      <div id="hash-output" class="output-content">
+        <div class="awaiting">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          AWAITING HASH REQUEST
+        </div>
+      </div>
+
+      <label class="field-label verify-label">VERIFY PASSWORD AGAINST HASH</label>
+      <input type="password" id="verify-input" class="field-input" placeholder="Enter password to verify..." autocomplete="off" />
+      <button class="btn-execute verify-btn" onclick="verifyPassword()">Verify Password</button>
+      <p id="verify-status" class="verify-status">No verification performed yet.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+let latestHash = '';
+
+async function hashPassword() {
+  const password = document.getElementById('hash-input').value;
+  if (!password) return;
+
+  const res = await fetch('/api/hash-password', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({password})
+  });
+  const data = await res.json();
+
+  const out = document.getElementById('hash-output');
+  if (!res.ok) {
+    out.textContent = data.error || 'Unable to hash password.';
+    return;
+  }
+
+  latestHash = data.hash;
+  out.innerHTML = '';
+  out.textContent = data.hash;
+  out.style.fontFamily = 'var(--mono)';
+  out.style.letterSpacing = '0.02em';
+  if (typeof animateSwap === 'function') animateSwap(out);
+
+  const status = document.getElementById('verify-status');
+  status.textContent = 'Hash generated. You can now verify a candidate password.';
+  status.className = 'verify-status';
+}
+
+async function verifyPassword() {
+  const password = document.getElementById('verify-input').value;
+  if (!latestHash || !password) return;
+
+  const res = await fetch('/api/verify-password', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({password, hash: latestHash})
+  });
+  const data = await res.json();
+  const status = document.getElementById('verify-status');
+
+  if (!res.ok) {
+    status.textContent = data.error || 'Verification failed.';
+    status.className = 'verify-status fail';
+    return;
+  }
+
+  status.textContent = data.valid ? 'MATCH: password is valid for this hash.' : 'NO MATCH: password does not match this hash.';
+  status.className = data.valid ? 'verify-status ok' : 'verify-status fail';
+  if (typeof animateSwap === 'function') animateSwap(status);
+}
+</script>
+{% endblock %}
