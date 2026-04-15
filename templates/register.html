@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoX - Register</title>
+  <meta name="description" content="Create a CryptoX account for the secure messenger exercise." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="login-body">
+  <div class="login-bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <main class="login-wrapper" role="main">
+    <div class="login-card" id="login-card">
+      <div class="login-brand">
+        <div class="login-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <span class="login-brand-name">CRYPTOX</span>
+      </div>
+
+      <h1 class="login-heading">Create Account</h1>
+      <p class="login-subheading">Register to try the encrypted messenger exercise</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="login-alert login-alert--{{ category }}" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('register') }}" class="login-form" novalidate id="register-form">
+        <div class="login-field">
+          <label class="login-label" for="username">Username</label>
+          <div class="login-input-wrap">
+            <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <input id="username" name="username" type="text" class="login-input" placeholder="Choose a username" autocomplete="username" required />
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label class="login-label" for="password">Password</label>
+          <div class="login-input-wrap">
+            <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input id="password" name="password" type="password" class="login-input" placeholder="Create a password" autocomplete="new-password" required />
+          </div>
+          <div class="register-strength-panel" id="register-strength-panel">
+            <div class="entropy-row">
+              <span class="login-label register-strength-label">Password Strength</span>
+              <span class="score-badge" id="register-score-badge">WEAK</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" id="register-progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="diag-box register-diag-box">
+              <div class="check-list">
+                <div class="check-item"><span class="chk-icon fail" id="check-length">!</span><span>More than 12 characters</span></div>
+                <div class="check-item"><span class="chk-icon fail" id="check-uppercase">!</span><span>At least one uppercase letter</span></div>
+                <div class="check-item"><span class="chk-icon fail" id="check-alphanumeric">!</span><span>Contains both letters and numbers</span></div>
+                <div class="check-item"><span class="chk-icon fail" id="check-special">!</span><span>At least one special character</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label class="login-label" for="confirm_password">Confirm Password</label>
+          <div class="login-input-wrap">
+            <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input id="confirm_password" name="confirm_password" type="password" class="login-input" placeholder="Repeat your password" autocomplete="new-password" required />
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn" id="register-submit-btn">
+          <span class="login-btn-text">Register</span>
+          <svg class="login-btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </form>
+
+      <p class="login-footer-text">
+        Browser keys are generated locally after sign-in
+      </p>
+      <p class="login-switch-text">
+        Already have an account?
+        <a href="{{ url_for('login') }}" class="login-switch-link">Sign in</a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const registerForm = document.getElementById('register-form');
+    const registerBtn = document.getElementById('register-submit-btn');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const scoreBadge = document.getElementById('register-score-badge');
+    const progressBar = document.getElementById('register-progress-bar');
+    const checkEls = {
+      length: document.getElementById('check-length'),
+      uppercase: document.getElementById('check-uppercase'),
+      alphanumeric: document.getElementById('check-alphanumeric'),
+      special: document.getElementById('check-special')
+    };
+
+    const strengthColors = {
+      WEAK: '#ef4444',
+      MODERATE: '#f59e0b',
+      GOOD: '#22c55e',
+      STRONG: '#8b5cf6'
+    };
+
+    async function updateStrength() {
+      const password = passwordInput.value;
+      if (!password) {
+        scoreBadge.textContent = 'WEAK';
+        progressBar.style.width = '0%';
+        progressBar.style.background = 'linear-gradient(90deg, #ef444488, #ef4444)';
+        Object.values(checkEls).forEach((el) => {
+          el.className = 'chk-icon fail';
+          el.textContent = '!';
+        });
+        registerBtn.disabled = true;
+        return false;
+      }
+
+      const response = await fetch('/api/password-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await response.json();
+
+      scoreBadge.textContent = data.label;
+      scoreBadge.style.color = strengthColors[data.label];
+      scoreBadge.style.borderColor = `${strengthColors[data.label]}55`;
+      progressBar.style.width = `${data.score}%`;
+      progressBar.style.background = `linear-gradient(90deg, ${strengthColors[data.label]}88, ${strengthColors[data.label]})`;
+
+      Object.entries(checkEls).forEach(([key, el]) => {
+        const passed = Boolean(data.checks[key]);
+        el.className = `chk-icon ${passed ? 'pass' : 'fail'}`;
+        el.textContent = passed ? '✓' : '!';
+      });
+
+      const strongAndConfirmed = data.label === 'STRONG' && confirmInput.value === password && password.length > 0;
+      registerBtn.disabled = !strongAndConfirmed;
+      return data.label === 'STRONG';
+    }
+
+    passwordInput.addEventListener('input', () => {
+      updateStrength().catch(() => {
+        registerBtn.disabled = true;
+      });
+    });
+
+    confirmInput.addEventListener('input', () => {
+      updateStrength().catch(() => {
+        registerBtn.disabled = true;
+      });
+    });
+
+    registerForm.addEventListener('submit', () => {
+      registerBtn.classList.add('loading');
+      registerBtn.disabled = true;
+    });
+
+    requestAnimationFrame(() => {
+      document.getElementById('login-card').classList.add('login-card--visible');
+    });
+
+    registerBtn.disabled = true;
+  </script>
+</body>
+</html>

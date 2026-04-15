@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoX â€” Security Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body data-username="{{ session.get('username', '') }}">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">CryptoX</div>
+      <div class="brand-sub">SECURITY SUITE</div>
+    </div>
+  </div>
+
+  <nav>
+    <p class="nav-label">TOOLS &amp; UTILITIES</p>
+    <a href="/" class="nav-item {% if active=='dashboard' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+      {% if active=='dashboard' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/password-strength" class="nav-item {% if active=='password' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Password Strength
+      {% if active=='password' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/caesar-cipher" class="nav-item {% if active=='caesar' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Caesar Cipher
+      {% if active=='caesar' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/vigenere-cipher" class="nav-item {% if active=='vigenere' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      Vigenère Cipher
+      {% if active=='vigenere' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/hashing-exercise" class="nav-item {% if active=='hashing' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11a4 4 0 1 1 7.8 1.3L20 20.5"/><path d="M15 15l2-2m-1 4l2-2m-6-6l2-2m-1 4l2-2"/></svg>
+      Hashing Lab
+      {% if active=='hashing' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/file-hash-exercise" class="nav-item {% if active=='filehash' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v6h6"/><path d="M8 13h8m-8 4h8"/><path d="M6 3h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+      TXT File Hash
+      {% if active=='filehash' %}<span class="dot"></span>{% endif %}
+    </a>
+    <a href="/secure-messenger-exercise" class="nav-item {% if active=='messenger' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg>
+      Secure Messenger
+      {% if active=='messenger' %}<span class="dot"></span>{% endif %}
+    </a>
+  </nav>
+</aside>
+
+<!-- Main -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <button class="toggle-btn" onclick="document.querySelector('.sidebar').classList.toggle('collapsed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><line x1="11" y1="3" x2="21" y2="3"/><line x1="11" y1="12" x2="21" y2="12"/><line x1="11" y1="21" x2="21" y2="21"/></svg>
+    </button>
+    <div class="topbar-actions">
+      <div class="system-status">
+        <span class="status-dot"></span>
+        SYSTEM SECURE
+      </div>
+      <button type="button" class="profile-trigger" id="profile-trigger" title="Profile settings" aria-label="Profile settings">
+        {{ session.get('username', 'U')[:1]|upper }}
+      </button>
+      <a href="/logout" class="topbar-logout" title="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sign out
+      </a>
+    </div>
+  </header>
+
+  <main class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="page-flash-stack">
+          {% for category, message in messages %}
+            <div class="page-flash page-flash--{{ category }}" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<div class="settings-modal" id="settings-modal" hidden>
+  <div class="settings-backdrop" data-close-settings></div>
+  <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="settings-panel-header">
+      <div>
+        <h2 id="settings-title">Profile Settings</h2>
+        <p>Update your username, password, or remove this account from the lab.</p>
+      </div>
+      <button type="button" class="settings-close" data-close-settings aria-label="Close settings">×</button>
+    </div>
+
+    <div class="settings-feedback" id="settings-feedback"></div>
+
+    <form class="settings-form" id="username-form">
+      <h3>Username</h3>
+      <input type="text" class="settings-input" id="settings-username" placeholder="New username" required />
+      <input type="password" class="settings-input" id="settings-username-password" placeholder="Current password" required />
+      <button type="submit" class="settings-btn">Update Username</button>
+    </form>
+
+    <form class="settings-form" id="password-form">
+      <h3>Password</h3>
+      <input type="password" class="settings-input" id="settings-current-password" placeholder="Current password" required />
+      <input type="password" class="settings-input" id="settings-new-password" placeholder="New strong password" required />
+      <input type="password" class="settings-input" id="settings-confirm-password" placeholder="Confirm new password" required />
+      <button type="submit" class="settings-btn">Update Password</button>
+    </form>
+
+    <form class="settings-form settings-form-danger" id="delete-account-form">
+      <h3>Delete Account</h3>
+      <p>This removes your account and the secure messages you sent from this lab environment.</p>
+      <input type="password" class="settings-input" id="settings-delete-password" placeholder="Current password" required />
+      <button type="submit" class="settings-btn settings-btn-danger">Delete Account</button>
+    </form>
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

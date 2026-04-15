@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="tool-header messenger-header">
+  <div class="tool-page-icon purple">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <path d="M8 9h8"/>
+      <path d="M8 13h5"/>
+    </svg>
+  </div>
+  <div>
+    <h1>Secure Messenger Exercise</h1>
+    <p class="tool-subtitle">Direct chats, group chats, files, and voice notes are encrypted in the browser before upload.</p>
+  </div>
+</section>
+
+<section class="messenger-shell panel" data-username="{{ username }}">
+  <aside class="messenger-sidebar">
+    <div class="messenger-brand-card">
+      <div class="messenger-brand-mark">C</div>
+      <div>
+        <h2>CryptoX Messenger</h2>
+        <p>Encrypted communication lab</p>
+      </div>
+    </div>
+
+    <div class="messenger-status-card">
+      <div>
+        <span class="messenger-status-dot"></span>
+        <strong>Encrypted Session</strong>
+      </div>
+      <p class="messenger-status-algo">AES-256-GCM + RSA-OAEP + RSA-PSS + X.509 CA</p>
+      <p id="messenger-status-text">Checking local device keys...</p>
+    </div>
+
+    <div class="messenger-contact-panel">
+      <div class="messenger-panel-title-row">
+        <span class="messenger-panel-title">Chats</span>
+        <button class="messenger-refresh-btn" id="refresh-users-btn" type="button">Refresh</button>
+      </div>
+      <div class="messenger-contact-list" id="contact-list">
+        <div class="messenger-empty-state">No contacts loaded yet.</div>
+      </div>
+    </div>
+
+    <div class="messenger-group-builder">
+      <div class="messenger-panel-title-row">
+        <span class="messenger-panel-title">Create Group</span>
+      </div>
+      <form id="group-form" class="messenger-group-form">
+        <div class="messenger-group-inline">
+          <input type="text" id="group-name" class="messenger-mini-input" placeholder="Group name" required />
+          <button type="submit" class="messenger-refresh-btn messenger-create-btn">Create</button>
+        </div>
+      </form>
+    </div>
+
+  </aside>
+
+  <div class="messenger-main">
+    <div class="messenger-thread-head">
+      <span id="conversation-title" class="messenger-thread-title">Choose a chat</span>
+      <div class="messenger-top-actions">
+        <div class="messenger-add-member-wrap" id="add-member-wrap" hidden>
+          <button type="button" class="messenger-icon-btn" id="add-member-toggle" title="Add member">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 5v14"/>
+              <path d="M5 12h14"/>
+            </svg>
+          </button>
+          <div class="messenger-add-member-popover" id="add-member-popover" hidden>
+            <div class="messenger-member-picker" id="add-member-picker">
+              <button type="button" class="messenger-member-picker-btn" id="add-member-picker-btn">
+                <span id="add-member-picker-label">Select member</span>
+                <span class="messenger-member-picker-caret">⌄</span>
+              </button>
+              <div class="messenger-member-options" id="add-member-options" hidden></div>
+            </div>
+            <button type="button" class="messenger-refresh-btn" id="add-member-btn">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="messenger-thread" id="message-thread">
+      <div class="messenger-thread-empty">
+        <h4>Secure channel ready</h4>
+        <p>Pick a user, create a group, or record a voice note. Everything is encrypted before it leaves the browser.</p>
+      </div>
+    </div>
+
+    <div class="messenger-meta-bar">
+      <span id="message-meta-text">Waiting for chat selection.</span>
+      <span>Current user: {{ username }}</span>
+    </div>
+
+    <form class="messenger-compose" id="compose-form" autocomplete="off">
+      <input type="file" id="file-input" class="file-input-hidden" />
+      <button type="button" class="messenger-side-btn" id="attach-btn" title="Attach file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l10.6-10.61a4 4 0 1 1 5.66 5.66L9.4 17.39a2 2 0 1 1-2.83-2.83l9.2-9.19"/></svg>
+      </button>
+      <textarea id="message-input" class="messenger-compose-input" placeholder="Write an encrypted message..." rows="1" disabled></textarea>
+      <button type="button" class="messenger-side-btn" id="record-btn" title="Record voice note" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg>
+      </button>
+      <button type="button" class="messenger-side-btn messenger-clear-btn" id="clear-attachment-btn" title="Clear selected file or voice" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 6L6 18"/>
+          <path d="M6 6l12 12"/>
+        </svg>
+      </button>
+      <button type="submit" class="messenger-send-btn" id="send-btn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M22 2L11 13"/>
+          <path d="M22 2L15 22 11 13 2 9z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/socket.io/socket.io.js"></script>
+<script src="{{ url_for('static', filename='messenger.js') }}"></script>
+{% endblock %}

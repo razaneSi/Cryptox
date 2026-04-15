@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="tool-page">
+  <div class="tool-header">
+    <div class="tool-page-icon purple">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v6h6"/><path d="M8 13h8m-8 4h8"/><path d="M6 3h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+    </div>
+    <div>
+      <h1>TXT File Hashing Lab</h1>
+      <p class="tool-subtitle">Upload a .txt file, hash its content with SHA-256, and verify against an expected hash.</p>
+    </div>
+  </div>
+
+  <div class="cipher-grid">
+    <div class="panel">
+      <label class="field-label">UPLOAD TXT FILE</label>
+      <input type="file" id="file-hash-input" class="file-input-hidden" accept=".txt,text/plain" />
+      <label for="file-hash-input" class="file-pick-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <span>Select TXT File</span>
+      </label>
+      <p id="file-hash-name" class="file-pick-name">No file selected</p>
+      <label class="field-label">HASH METHOD</label>
+      <div class="method-select" data-target-input="file-hash-method">
+        <button type="button" class="method-select-trigger" data-select-trigger>
+          <span data-select-label>SHA-256</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="method-select-menu" data-select-menu>
+          <button type="button" class="method-option is-selected" data-value="sha256">SHA-256</button>
+          <button type="button" class="method-option" data-value="md5">MD5</button>
+          <button type="button" class="method-option" data-value="scrypt">generate_password_hash (scrypt)</button>
+        </div>
+        <input type="hidden" id="file-hash-method" value="sha256" />
+      </div>
+
+      <button class="btn-execute" onclick="hashTxtFile()">
+        <span>Hash File Content</span>
+      </button>
+
+      <div class="diag-box hash-meta">
+        <p class="diag-title">FILE HASH NOTES</p>
+        <div class="check-list">
+          <div class="check-item">
+            <span class="chk-icon pass">i</span>
+            <span>Algorithm: SHA-256 ,
+               MD5 ,generate_password_hash (scrypt).</span>
+          </div>
+          <div class="check-item">
+            <span class="chk-icon pass">i</span>
+            <span>Only .txt files are accepted in this exercise.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel output-panel">
+      <div class="output-header">
+        <span class="field-label">FILE HASH OUTPUT</span>
+        <button class="copy-btn" onclick="copyOutput('file-hash-output')" title="Copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+      <div id="file-hash-output" class="output-content file-hash-output">
+        <div class="awaiting">AWAITING TXT FILE</div>
+      </div>
+
+      <label class="field-label verify-label">VERIFY FILE AGAINST HASH</label>
+      <input type="file" id="file-verify-input" class="file-input-hidden" accept=".txt,text/plain" />
+      <label for="file-verify-input" class="file-pick-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <span>Select TXT For Verification</span>
+      </label>
+      <p id="file-verify-name" class="file-pick-name">No file selected</p>
+      <label class="field-label">VERIFICATION METHOD</label>
+      <div class="method-select" data-target-input="file-verify-method">
+        <button type="button" class="method-select-trigger" data-select-trigger>
+          <span data-select-label>SHA-256</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="method-select-menu" data-select-menu>
+          <button type="button" class="method-option is-selected" data-value="sha256">SHA-256</button>
+          <button type="button" class="method-option" data-value="md5">MD5</button>
+          <button type="button" class="method-option" data-value="scrypt">generate_password_hash (scrypt)</button>
+        </div>
+        <input type="hidden" id="file-verify-method" value="sha256" />
+      </div>
+      <input type="text" id="expected-hash-input" class="field-input" placeholder="Paste expected hash value..." />
+      <button class="btn-execute verify-btn" onclick="verifyTxtFile()">Verify File Hash</button>
+      <p id="file-verify-status" class="verify-status">No file verification performed yet.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function bindFileName(inputId, labelId) {
+  const input = document.getElementById(inputId);
+  const label = document.getElementById(labelId);
+  input.addEventListener('change', () => {
+    label.textContent = input.files[0] ? input.files[0].name : 'No file selected';
+  });
+}
+
+bindFileName('file-hash-input', 'file-hash-name');
+bindFileName('file-verify-input', 'file-verify-name');
+
+function initMethodSelect(root) {
+  const trigger = root.querySelector('[data-select-trigger]');
+  const menu = root.querySelector('[data-select-menu]');
+  const label = root.querySelector('[data-select-label]');
+  const hiddenId = root.dataset.targetInput;
+  const hidden = document.getElementById(hiddenId);
+  const options = [...root.querySelectorAll('.method-option')];
+
+  trigger.addEventListener('click', () => {
+    const isOpen = root.classList.contains('open');
+    document.querySelectorAll('.method-select.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) root.classList.add('open');
+  });
+
+  options.forEach((opt) => {
+    opt.addEventListener('click', () => {
+      options.forEach((x) => x.classList.remove('is-selected'));
+      opt.classList.add('is-selected');
+      hidden.value = opt.dataset.value;
+      label.textContent = opt.textContent;
+      root.classList.remove('open');
+    });
+  });
+}
+
+document.querySelectorAll('.method-select').forEach(initMethodSelect);
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.method-select')) {
+    document.querySelectorAll('.method-select.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+async function hashTxtFile() {
+  const file = document.getElementById('file-hash-input').files[0];
+  const method = document.getElementById('file-hash-method').value;
+  const out = document.getElementById('file-hash-output');
+  if (!file) return;
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('method', method);
+
+  const res = await fetch('/api/hash-text-file', { method: 'POST', body: form });
+  const data = await res.json();
+  if (!res.ok) {
+    out.textContent = data.error || 'Unable to hash file.';
+    return;
+  }
+
+  out.innerHTML = '';
+  out.textContent = `${data.algorithm.toUpperCase()}(${data.filename}) = ${data.hash}`;
+  out.style.fontFamily = 'var(--mono)';
+  out.style.letterSpacing = '0.02em';
+  if (typeof animateSwap === 'function') animateSwap(out);
+}
+
+async function verifyTxtFile() {
+  const file = document.getElementById('file-verify-input').files[0];
+  const method = document.getElementById('file-verify-method').value;
+  const expectedHash = document.getElementById('expected-hash-input').value.trim();
+  const status = document.getElementById('file-verify-status');
+  if (!file || !expectedHash) return;
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('expected_hash', expectedHash);
+  form.append('method', method);
+
+  const res = await fetch('/api/verify-text-file-hash', { method: 'POST', body: form });
+  const data = await res.json();
+  if (!res.ok) {
+    status.textContent = data.error || 'Verification failed.';
+    status.className = 'verify-status fail';
+    return;
+  }
+
+  if (method === 'scrypt') {
+    status.textContent = data.valid ? 'MATCH: file content matches provided scrypt hash.' : 'NO MATCH: file content does not match provided scrypt hash.';
+  } else {
+    status.textContent = data.valid ? `MATCH: ${data.computed_hash}` : `NO MATCH: computed ${data.computed_hash}`;
+  }
+  status.className = data.valid ? 'verify-status ok' : 'verify-status fail';
+  if (typeof animateSwap === 'function') animateSwap(status);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="tool-page">
+  <div class="tool-header">
+    <div class="tool-page-icon purple">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+    </div>
+    <div>
+      <h1>VigenÃ¨re Cipher</h1>
+      <p class="tool-subtitle">Polyalphabetic substitution utilizing a dynamic keyword matrix.</p>
+    </div>
+  </div>
+
+  <div class="cipher-grid">
+    <div class="panel">
+      <div class="mode-tabs">
+        <button class="tab active" id="tab-enc" onclick="setMode('encrypt')">Encrypt Payload</button>
+        <button class="tab" id="tab-dec" onclick="setMode('decrypt')">Decrypt Payload</button>
+      </div>
+
+      <label class="field-label">SOURCE DATA</label>
+      <textarea id="vig-input" class="field-textarea" placeholder="Enter text..."></textarea>
+
+      <label class="field-label">KEYWORD MATRIX STRING</label>
+      <input type="text" id="vig-key" class="field-input" value="CLE" placeholder="e.g. SECRET" />
+
+      <label class="option-row" for="vig-count-spaces">
+        <input type="checkbox" id="vig-count-spaces" checked />
+        <span>Count spaces in key progression</span>
+      </label>
+
+      <button class="btn-execute" onclick="runVigenere()">
+        <span id="vig-btn-label">Execute Encryption</span>
+      </button>
+    </div>
+
+    <div class="panel output-panel">
+      <div class="output-header">
+        <span class="field-label">PROCESSED OUTPUT</span>
+        <button class="copy-btn" onclick="copyOutput('vig-output')" title="Copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+      <div id="vig-output" class="output-content">
+        <div class="awaiting">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          AWAITING INPUT
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+let currentMode = 'encrypt';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('tab-enc').classList.toggle('active', mode === 'encrypt');
+  document.getElementById('tab-dec').classList.toggle('active', mode === 'decrypt');
+  document.getElementById('vig-btn-label').textContent = mode === 'encrypt' ? 'Execute Encryption' : 'Execute Decryption';
+}
+
+async function runVigenere() {
+  const text = document.getElementById('vig-input').value;
+  const key = document.getElementById('vig-key').value;
+  const countSpaces = document.getElementById('vig-count-spaces').checked;
+  if (!text || !key) return;
+
+  const res = await fetch('/api/vigenere', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({text, key, mode: currentMode, count_spaces: countSpaces})
+  });
+  const data = await res.json();
+  const out = document.getElementById('vig-output');
+  out.innerHTML = '';
+  out.textContent = data.result;
+  out.style.fontFamily = 'var(--mono)';
+  out.style.letterSpacing = '0.05em';
+  if (typeof animateSwap === 'function') animateSwap(out);
+}
+</script>
+{% endblock %}
