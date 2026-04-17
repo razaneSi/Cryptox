@@ -1,5 +1,6 @@
-to run locally python app.py
 https://cryptox.ddns.net
+
+to run locally python app.py
 ```
 
 **Live Deployment**: https://cryptox.ddns.net/ (WireGuard VPN access required)
