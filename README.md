@@ -3,7 +3,6 @@ https://cryptox.ddns.net
 to run locally python app.py
 ```
 
-**Live Deployment**: https://cryptox.ddns.net/ (WireGuard VPN access required)
 
 **Local**: Open http://127.0.0.1:5000 in your browser.
 
